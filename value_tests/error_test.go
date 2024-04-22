@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/json-iterator/go"
+	"github.com/go-shafaq/jsoniter"
 	"github.com/stretchr/testify/require"
 	"reflect"
 	"testing"
