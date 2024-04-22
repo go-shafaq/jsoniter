@@ -1,4 +1,4 @@
-# encoding-json
+# jsoniter
 
 forked from github.com/json-iterator/go
 
