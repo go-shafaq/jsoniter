@@ -1,85 +1,72 @@
-[![Sourcegraph](https://sourcegraph.com/github.com/json-iterator/go/-/badge.svg)](https://sourcegraph.com/github.com/json-iterator/go?badge)
-[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](https://pkg.go.dev/github.com/json-iterator/go)
-[![Build Status](https://travis-ci.org/json-iterator/go.svg?branch=master)](https://travis-ci.org/json-iterator/go)
-[![codecov](https://codecov.io/gh/json-iterator/go/branch/master/graph/badge.svg)](https://codecov.io/gh/json-iterator/go)
-[![rcard](https://goreportcard.com/badge/github.com/json-iterator/go)](https://goreportcard.com/report/github.com/json-iterator/go)
-[![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/json-iterator/go/master/LICENSE)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/json-iterator/Lobby)
+# encoding-json
 
-A high-performance 100% compatible drop-in replacement of "encoding/json"
+forked from github.com/json-iterator/go
 
-# Benchmark
+Added future:
 
-![benchmark](http://jsoniter.com/benchmarks/go-benchmark.png)
+    casting names automatically if needed
+#
+    no more tagging every single field to specify its name
 
-Source code: https://github.com/json-iterator/go-benchmark/blob/master/src/github.com/json-iterator/go-benchmark/benchmark_medium_payload_test.go
+## Basic Usage
 
-Raw Result (easyjson requires static code generation)
+### Installation
 
-|                 | ns/op       | allocation bytes | allocation times |
-| --------------- | ----------- | ---------------- | ---------------- |
-| std decode      | 35510 ns/op | 1960 B/op        | 99 allocs/op     |
-| easyjson decode | 8499 ns/op  | 160 B/op         | 4 allocs/op      |
-| jsoniter decode | 5623 ns/op  | 160 B/op         | 3 allocs/op      |
-| std encode      | 2213 ns/op  | 712 B/op         | 5 allocs/op      |
-| easyjson encode | 883 ns/op   | 576 B/op         | 3 allocs/op      |
-| jsoniter encode | 837 ns/op   | 384 B/op         | 4 allocs/op      |
+```bash
+go get github.com/go-shafaq/jsoniter
+```
 
-Always benchmark with your own workload.
-The result depends heavily on the data input.
 
-# Usage
+### Code
 
-100% compatibility with standard lib
-
-Replace
+Here is a minimal example.
 
 ```go
-import "encoding/json"
-json.Marshal(&data)
+package main
+
+import (
+	"fmt"
+	"github.com/go-shafaq/defcase"
+	jsoniter "github.com/go-shafaq/jsoniter"
+)
+
+func main() {
+	// Get Public Default case
+	dcase := defcase.Get()
+	// Set a case for "json" tag and specific package
+	// "*" means any package
+	dcase.SetCase("json", "*", defcase.Snak_case)
+	
+	// Set a Default_Case to library
+	jsoniter.SetDefCase(dcase)
+	// Marshal a struct (which has no tags)
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+	bytes, _ := json.Marshal(Item{Id: 3, Name: "laptop", CategoryId: 11})
+
+	fmt.Println(string(bytes))
+}
+
+type Item struct {
+	Id         int `casting:"no more tags"`
+	Name       string
+	CategoryId int
+}
 ```
 
-with
+### Terminal
 
-```go
-import jsoniter "github.com/json-iterator/go"
+Printed result
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-json.Marshal(&data)
+```json
+{"id":3,"name":"laptop","category_id":11}
 ```
 
-Replace
+Pretty json
 
-```go
-import "encoding/json"
-json.Unmarshal(input, &data)
+```json
+{
+  "id": 3,
+  "name": "laptop",
+  "category_id": 11
+}
 ```
-
-with
-
-```go
-import jsoniter "github.com/json-iterator/go"
-
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-json.Unmarshal(input, &data)
-```
-
-[More documentation](http://jsoniter.com/migrate-from-go-std.html)
-
-# How to get
-
-```
-go get github.com/json-iterator/go
-```
-
-# Contribution Welcomed !
-
-Contributors
-
-- [thockin](https://github.com/thockin)
-- [mattn](https://github.com/mattn)
-- [cch123](https://github.com/cch123)
-- [Oleg Shaldybin](https://github.com/olegshaldybin)
-- [Jason Toffaletti](https://github.com/toffaletti)
-
-Report issue or pull request, or email taowen@gmail.com, or [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/json-iterator/Lobby)
