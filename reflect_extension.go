@@ -373,7 +373,7 @@ func describeStruct(ctx *ctx, typ reflect2.Type) *StructDescriptor {
 				}
 			}
 		}
-		fieldNames := calcFieldNames(field.Name(), tagParts[0], tag)
+		fieldNames := calcFieldNames(field.Name(), tagParts[0], tag, structType.PkgPath())
 		fieldCacheKey := fmt.Sprintf("%s/%s", typ.String(), field.Name())
 		decoder := fieldDecoders[fieldCacheKey]
 		if decoder == nil {
@@ -462,7 +462,7 @@ func processTags(structDescriptor *StructDescriptor, cfg *frozenConfig) {
 	}
 }
 
-func calcFieldNames(originalFieldName string, tagProvidedFieldName string, wholeTag string) []string {
+func calcFieldNames(originalFieldName, tagProvidedFieldName, wholeTag, pkgPath string) []string {
 	// ignore?
 	if wholeTag == "-" {
 		return []string{}
@@ -470,7 +470,7 @@ func calcFieldNames(originalFieldName string, tagProvidedFieldName string, whole
 	// rename?
 	var fieldNames []string
 	if tagProvidedFieldName == "" {
-		fieldNames = []string{originalFieldName}
+		fieldNames = []string{defCase.Convert("json", pkgPath, originalFieldName)}
 	} else {
 		fieldNames = []string{tagProvidedFieldName}
 	}
